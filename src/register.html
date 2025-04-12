@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/2f8e00186e.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="style.css">
+    <title>Register</title>
+</head>
+<body>
+    <main>
+        <header>
+            <h1>Register</h1>
+        </header>
+        <form class="register-form" id="register-fomr">
+            <div class="register-form-div">
+                
+
+                <label popover id="popover1" for="username" class="hidden">Username</label>
+                <input type="text" id="username" name="username" placeholder="username" required>
+                
+                <label popover id="popover2" for="password" class="hidden">Password</label>
+                <input type="password" id="password" name="password" class="hidden" placeholder="password">
+
+                <label popover id="popover3" for="confirm-password" class="hidden">Confirm Password</label>
+                <input type="password" id="confirm-password" name="confirm-password" class="hidden" placeholder="confirm password">
+
+                <button type="submit" class="submit hidden" id="submit_button"><i class="fa-solid fa-paper-plane"></i></button>
+                <p>Already have an account? <a href="log_in.html">Log In</a></p>
+            </div>
+        </form>
+    </main>
+
+</body>
+<script src="/socket.io/socket.io.js"></script>
+<script src="register.js"></script>
+</html>

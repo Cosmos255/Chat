@@ -1,0 +1,167 @@
+*{
+    transition: all 0.5s;
+}
+
+
+
+
+:root {
+    --bg-dark-color: #121212;
+    --bg-darkv2-color: #1a1a1a;
+                      
+    --div-dark-color: #1E1E1E;
+    --div-darkv2-color: #232323;
+
+    --bg-darkv3-color: #181A1B;                
+    --div-darkv3-color: #25282A;
+
+    --bg-light-color: #F8F9FA;
+    --div-light-color: #FFFFFF;
+
+    --bg-discord-color: oklab(0.13 0 0);
+    --bg-discordv2-color: oklab(0.16 0 0);
+
+}
+
+
+/* Main page */
+
+body{
+    font-family: "Roboto", sans-serif;
+    background-color: var(--bg-darkv3-color);  ;
+    color: white;
+    display: flex;
+}
+
+
+
+#form{
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    display: flex;
+
+}
+
+#input{
+    width: 100%;
+    height: 2.7rem;
+    border: none;
+    border-radius: 10px;
+    padding: 0 15px;
+    font-size: 1.2rem;
+    background-color: var(--div-darkv2-color);
+    color: white;
+    margin-bottom: 15px;
+}
+
+#input:focus{
+    outline: none;
+}
+
+.submit{
+    width: 5rem;
+    height: 2.7rem;
+    border: none;
+    border-radius: 10px;
+    background-color: var(--div-darkv3-color);
+    color: white;
+    font-size: 1.2rem;
+    cursor: pointer;
+    margin-right: 15px;
+}
+
+
+#messages{
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
+    padding: 0 15px;
+}
+
+li{
+    background-color: var(--div-darkv3-color);
+    color: white;
+    padding: 10px 15px;
+    border-radius: 15px;
+    font-size: 1.5rem;
+    margin-bottom: 5rem;
+}
+
+li::marker{
+    color: transparent;
+}
+
+
+
+
+/* Register Page */
+
+.register-form{
+    padding: 5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    
+}
+
+.register-form-div{
+    background-color: var(--div-darkv2-color);
+    padding: 2rem;
+    border-radius: 10px;
+    width: 30rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+}
+
+.register-form input{
+    width: 100%;
+    height: 2.7rem;
+    border: none;
+    border-radius: 10px;
+    padding: 0 15px;
+    font-size: 1.2rem;
+    background-color: var(--div-darkv3-color);
+    color: white;
+}
+
+.register-form label{
+    color: white;
+    font-size: 1.rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+
+}
+
+.register-form button{
+    width: 100%;
+    height: 2.7rem;
+    border: none;
+    border-radius: 10px;
+    background-color: var(--div-darkv3-color);
+    color: white;
+    font-size: 1.2rem;
+    cursor: pointer;
+    
+}
+
+.register-form button:hover{
+    background-color: var(--div-dark-color);
+}
+
+.error{
+    border: 1px solid red !important;
+    color: red !important;
+}
+
+.hidden{
+    display: none;
+}
+
+main{
+    width: 100%;
+}
