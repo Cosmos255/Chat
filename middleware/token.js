@@ -8,15 +8,8 @@ class Token {
 
     generateToken(payload) {
         const token = jwt.sign(payload, this.secretKey, { expiresIn: '1h' });
-        
-        const cookie = ('token', token, {
-            httpOnly: true,
-            secure: true,
-            sameSite: 'Strict',
-            maxAge: 3600000, // 1 hour in milliseconds
-        })
-
-        return cookie;
+    
+        return token;
     }
 
     verifyToken(token) {
@@ -28,7 +21,7 @@ class Token {
         }
     }
 
-    blacklistToken(token) {
+    blacklistedToken(token) {
         config.blacklistTokens.add(token);
         return true
     }

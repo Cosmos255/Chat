@@ -22,7 +22,10 @@ db.connect()
 
 
 app.use(express.json())
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:3000', 
+  credentials: true    
+}));
 app.use(cookieParser())
 app.use(express.static(path.join(__dirname, 'src')));
 
@@ -38,8 +41,11 @@ app.get('/messages', (req, res) => {
             return res.redirect('log_in')
         }
 
-        const payload = jwt.verify(token, 'key')
-        res.send(indexHTML)
+        const decoded = tk.verifyToken(token)
+        if(!decoded){
+            return res.status(400).json({ message: "Password is incorrect", redirect: "/log_in" });
+        }
+        res.sendFile(config.paths.indexHTML)
 
     }catch (err){
         console.log(err)
@@ -48,11 +54,11 @@ app.get('/messages', (req, res) => {
 })
 
 app.get('/log_in', (req, res) => {
-    res.send(log_in)
+    res.sendFile(config.paths.log_in)
 })
 
 app.get('/register', (req, res) => {
-    res.send(register)
+    res.sendFile(config.paths.register)
 })
 
 app.get('/style.css', (req, res) => {
@@ -63,68 +69,78 @@ app.get('/script.js', (req, res) => {
 })
 
 app.post('/log_in', async (req, res) => {
-    const {username, password} = req.body
-    if(!username || !password){
-        return res.status(400).json({message: "Username and password are required"})
+  try {
+    const { username, password } = req.body;
+
+    // Check for missing fields
+    if (!username || !password) {
+      return res.status(400).json({ message: "Username and password are required" });
     }
 
-    const collection = db.collection('users')
-    const user = await checkUser(username)
-    if(!user){
-        return res.status(400).json({message: "User not found"})
+    // Check if user exists
+    const user = await db.checkUser(username);
+    if (!user) {
+      return res.status(400).json({ message: "User not found" });
     }
 
-    const validPassword = await checkPassword(password, user)
-    if(!validPassword){
-        return res.status(400).json({message: "Invalid password"})
+    // Validate password
+    const valid = await db.checkLogin(username, password); // make sure this returns a Promise if async
+    if (!valid) {
+      return res.status(400).json({ message: "Password is incorrect" });
     }
 
-    if(validPassword){
-       // const cookie = req.cookies.token
-       // const decodedToken = jwt.verify(cookie, )
-
-        //if(req.cookies.token &! blacklistedTokens.has(req.cookies.token)){
-           // const cookie = req.cookies.token
-          //  return res.status(200).json({message: "User already logged in", redirect:'/messages'})
-        //}
-       // elseif(blacklistedTokens.has(req.cookies.token) | !req.cookies.token){
-            const token = jwt.sign({username}, 'key', {
-                expiresIn: '1h'
-            })
-
-            res.cookie('token', token, {
-                httpOnly: true,
-                secure: true,
-                sameSite: 'Strict',
-                maxAge: 3600000 // 1 hour
-            })
-
-            return res.status(200).json({message: "User logged in successfully", redirect:'/messages'})
-      //  }  
+    // Check for existing token
+    const cookie = req.cookies.token;
+    let decodedToken = null;
+    
+    if (cookie) {
+      try {
+        decodedToken = tk.verifyToken(cookie); // assuming this verifies the JWT
+      } catch (err) {
+        console.warn("Invalid or expired token"); // silently ignore
+      }
     }
-})
+
+    if (cookie && decodedToken && !config.blacklistedTokens.has(decodedToken)) {
+      return res.status(200).json({ message: "User already logged in", redirect: '/messages' });
+    }
+
+    // Otherwise generate a new token
+    const token = await tk.generateToken({username}); // returns JWT
+
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: true,          // only send over HTTPS
+      sameSite: 'Strict',    // protect against CSRF
+      maxAge: 3600000        // 1 hour
+    });
+
+    return res.status(200).json({ message: "User logged in successfully", redirect: '/messages' });
+
+  } catch (error) {
+    console.error("Login error:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+
+
 
 app.post('/register', async (req, res) => {
     try{
-        await connect()
+        await db.connect()
         const {username, password} = req.body
 
         if(!username || !password){
             return res.status(400).json({message: "Username and password are required"})
         }
 
-        encrypetdPassword = await bcrypt.hash(password, 10)
-
-        const collection = db.collection('users')
-
-        const existingUser = await collection.findOne({username: username})
+        const existingUser = await db.registerUser(username, password)
         if(existingUser){
             return res.status(400).json({message: "User already exists"})
         }
 
-        await collection.insertOne({username: username, password: encrypetdPassword})
-
-        res.status(201).redirect('localhost:3000/log_in')    
+        res.status(201).redirect('/log_in')    
 
     }catch(e){
         console.log(e)
@@ -135,8 +151,8 @@ app.post('/register', async (req, res) => {
 app.post('/logout', (req, res) => {
     const token = req.cookies.token
     if(token){
-        const decodedToken = jwt.verify(token, process.env.JWT_SECRET)
-        blacklistedTokens.add(decodedToken.jti)
+        const decodedToken = tk.verifyToken(token)
+        tk.blacklistToken(decodedToken)
         res.clearCookie('token')
         res.json({message: "User logged out successfully", redirect: '/log_in'})
     
@@ -148,6 +164,7 @@ app.post('/logout', (req, res) => {
 
 const {Server} = require("socket.io");
 const { redirect } = require('next/dist/server/api-utils');
+const { error } = require('console');
 const io = new Server(app.listen(port, () => {
     console.log("Running")
 }))

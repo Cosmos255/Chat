@@ -1,5 +1,7 @@
 const {MongoClient} = require('mongodb');
-const config = require('./middleware/config.js')
+const path = require('path');
+const config_path = path.join(__dirname, "../middleware/config.js");
+const config = require(config_path);
 const bcrypt = require('bcrypt');
 
 class db {
@@ -83,4 +85,4 @@ class db {
         
 }
 
-module.exports = new DB();
+module.exports = new db();
