@@ -33,18 +33,22 @@ app.get('/', (req, res) => {
     res.redirect('/messages')
 })
 
-app.get('/messages', (req, res) => {
+app.get('/messages', async (req, res) => {
     try{
         const token = req.cookies.token
-
+        console.log("Received token:", token);
         if(!token){ 
-            return res.redirect('log_in')
+            return res.sendFile(config.paths.log_in)
         }
 
-        const decoded = tk.verifyToken(token)
-        if(!decoded){
-            return res.status(400).json({ message: "Password is incorrect", redirect: "/log_in" });
-        }
+        const decoded = await tk.verifyToken(token)
+   //     console.log(await decoded)
+    //    if(!decoded){
+    //       return res.status(400).json({ message: "Password is incorrect", /*redirect: "/log_in" */ });
+    //    }
+
+    //    console.log("Decoded token:", decoded);
+
         res.sendFile(config.paths.indexHTML)
 
     }catch (err){
@@ -110,9 +114,10 @@ app.post('/log_in', async (req, res) => {
 
     res.cookie('token', token, {
       httpOnly: true,
-      secure: true,          // only send over HTTPS
+      secure: process.env.NODE_ENV === 'production',          // only send over HTTPS
       sameSite: 'Strict',    // protect against CSRF
-      maxAge: 3600000        // 1 hour
+      maxAge: 3600000,        // 1 hour
+      path: '/'
     });
 
     return res.status(200).json({ message: "User logged in successfully", redirect: '/messages' });
@@ -151,8 +156,8 @@ app.post('/register', async (req, res) => {
 app.post('/logout', (req, res) => {
     const token = req.cookies.token
     if(token){
-        const decodedToken = tk.verifyToken(token)
-        tk.blacklistToken(decodedToken)
+        const decodedToken = tk.verifyToken(token) //returns the jti
+        tk.blacklistToken(decodedToken) //Only the jti please
         res.clearCookie('token')
         res.json({message: "User logged out successfully", redirect: '/log_in'})
     

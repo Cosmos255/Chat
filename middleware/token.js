@@ -15,7 +15,7 @@ class Token {
     verifyToken(token) {
         try {
             verTok = jwt.verify(token, this.secretKey);
-            return verTok.jti;
+            return verTok;
         } catch (error) {
             return null;
         }

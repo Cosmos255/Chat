@@ -1,10 +1,14 @@
-const url_login = "http://localhost:3000/login";
+const url_login = "http://localhost:3000/log_in";
 const username_input = document.getElementById("username") as HTMLInputElement;
 const password_input = document.getElementById("password") as HTMLInputElement;
 const button_login = document.getElementById("submit_button") as HTMLButtonElement;
+const loginform = document.querySelector('#register-form') as HTMLFormElement;
 
+loginform.addEventListener('submit', async (e) => {
+  e.preventDefault(); // <- This prevents the page from reloading!
 
-
+  // Your fetch login code here
+});
 
 class Login {
 
@@ -37,9 +41,8 @@ class Login {
     }
 
     async log_in(data:any){
-        try {
-            const {username, password} = data 
-            const response = await fetch(url, {
+        try { 
+            const response = await fetch(url_login, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -47,16 +50,13 @@ class Login {
                 credentials: "include",
                 body: JSON.stringify(data)
             })
-
-            console.log(await response.json());
+            const responseData = await response.json();
+            console.log(responseData);
             if (response.status === 200) {
-                const responseData = await response.json();
-                window.location.href = `localhost:3000/ + ${responseData.redirect} `
+                window.location.assign(responseData.redirect);
 
             } else {
-                const errorMessage = await response.text();
-                console.error(errorMessage);
-                this.showPopover("login_error", errorMessage);
+                this.showPopover("login_error", responseData.message || "Login failed");
             }
 
         }
@@ -65,10 +65,16 @@ class Login {
         }
     }
 
-    showPopover(id:string, message:string) {
-        const popover = document.getElementById(id) as HTMLDivElement;
-        popover.innerHTML = message;
-        popover.showPopover();
+    showPopover(id: string, message: string) {
+        const popover = document.getElementById(id) as HTMLDivElement | null;
+        if (popover) {
+            popover.innerHTML = message;
+            if ('showPopover' in popover) {
+                popover.showPopover(); // If browser supports it
+            }
+        } else {
+            console.warn(`Popover element #${id} not found`);
+        }
     }
 
     hidePopover(id:string) {
@@ -81,10 +87,11 @@ class Login {
 
 const login = new Login();
 
-button_login.addEventListener("click", ()=> {
+button_login.addEventListener("click", (e)=> {
+    e.preventDefault();
     const data = {
         username: username_input.value,
         password: password_input.value,
     }
-    login.init(data);
+    login.log_in(data);
 })

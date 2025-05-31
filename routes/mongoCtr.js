@@ -30,7 +30,7 @@ class db {
     async checkUser(username) {
         const collection = this.db.collection('users');
         const user = await collection.findOne({ username });
-        return user ? true : false;
+        return user;
     }
 
     async checkLogin(username, password) {
@@ -66,7 +66,7 @@ class db {
 
     async deleteUser(username, password) {
         try{
-            const sel_user = this.checkUser(username, password)
+            const sel_user = await this.checkUser(username, password)
             if(!sel_user) {
                 return false; // User not found or password incorrect
             }
