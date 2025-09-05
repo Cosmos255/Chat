@@ -145,11 +145,11 @@ app.post('/register', async (req, res) => {
         if(existingUser){
             return res.status(400).json({message: "User already exists"})
         }
-        res.status(201).json({message:"Redirects lol"})
+       // res.status(201).json({message:"Redirects lol"})
 
         //Tryna fix redirects cuz they are broken and i have no idea why
 
-        //res.status(301).redirect('/log_in')    
+        res.status(301).json({message:'/log_in'})    
 
     }catch(e){
         console.log(e)
