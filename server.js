@@ -37,11 +37,11 @@ app.get('/messages', async (req, res) => {
     try{
         const token = req.cookies.token
         console.log("Received token:", token);
-        if(!token){ 
-            return res.sendFile(config.paths.log_in)
-        }
+        //if(!token){ 
+        //    return res.sendFile(config.paths.log_in)
+        //}
 
-        const decoded = await tk.verifyToken(token)
+        //const decoded = await tk.verifyToken(token)
    //     console.log(await decoded)
     //    if(!decoded){
     //       return res.status(400).json({ message: "Password is incorrect", /*redirect: "/log_in" */ });
@@ -135,6 +135,7 @@ app.post('/register', async (req, res) => {
     try{
         await db.connect()
         const {username, password} = req.body
+        console.log(username, password)
 
         if(!username || !password){
             return res.status(400).json({message: "Username and password are required"})
@@ -144,8 +145,11 @@ app.post('/register', async (req, res) => {
         if(existingUser){
             return res.status(400).json({message: "User already exists"})
         }
+        res.status(201).json({message:"Redirects lol"})
 
-        res.status(201).redirect('/log_in')    
+        //Tryna fix redirects cuz they are broken and i have no idea why
+
+        //res.status(301).redirect('/log_in')    
 
     }catch(e){
         console.log(e)

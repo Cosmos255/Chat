@@ -60,7 +60,7 @@ class Register {
                     headers: {
                         "Content-Type": "application/json"
                     },
-                    redirect: "follow",
+                    //redirect: "follow",
                     body: JSON.stringify(data)
                 });
                 console.log(await response.json());

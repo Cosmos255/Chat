@@ -52,15 +52,15 @@ class db {
             const collection = this.db.collection('users');
             const hashedPassword = await bcrypt.hash(password, 10);
             if(await this.checkUser(username)) {
-                return false; // User already exists
+                return true; // User already exists
             }else {
                 const result = await collection.insertOne({ username, password: hashedPassword });
-                return result.acknowledged ? true : false;
+                return result.acknowledged ? false : true;
             }
         }
         catch(error){
             console.error("Error registering user:", error);
-            return false;
+            return true;
         }
     }
 
