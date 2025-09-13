@@ -186,9 +186,9 @@ io.on('connection', (socket) => {
         console.log(client.db('messages').collection("author").find())
     })
 
-    socket.on('new_message',(message)=>{
-        console.log(message)
-        io.emit('message',message)
+    socket.on('new_message',(username , message)=>{
+        console.log(`${username}: ${message}`)
+        io.emit('message',username, message)
     })
 })
 

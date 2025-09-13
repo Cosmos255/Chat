@@ -60,11 +60,10 @@ class Register {
                     headers: {
                         "Content-Type": "application/json"
                     },
+                    redirect: "follow",
                     body: JSON.stringify(data)
                 });
-                const data1 = await response.json();
-                window.location.href =`http://localhost:3000${data1.message} `
-                
+                console.log(await response.json());
             }
             catch (error) {
                 console.error(error);
