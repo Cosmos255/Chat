@@ -12,12 +12,13 @@ class Token {
         return token;
     }
 
-    verifyToken(token) {
+    async verifyToken(token) {
         try {
-            verTok = jwt.verify(token, this.secretKey);
+            verTok = await jwt.verify(token, this.secretKey);
             return verTok;
         } catch (error) {
-            return null;
+            console.log(error);
+            return jwt.verify(token, this.secretKey);
         }
     }
 
