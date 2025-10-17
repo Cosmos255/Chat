@@ -25,5 +25,6 @@ module.exports = {
   corsOptions,
   JWT_SECRET_KEY,
   DB_URI,
+  blacklistTokens,
   paths
 };

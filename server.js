@@ -27,6 +27,46 @@ app.use(cors({
   credentials: true    
 }));
 app.use(cookieParser())
+
+app.post('/JWT', async(req,res) =>{
+    try{
+    const username = "sebi";
+    const token = await tk.generateToken({username});
+    console.log(token);
+    res.cookie('token', token, { maxAge:3600000, httpOnly:true})
+    console.log("cookie has beeen created");
+    }catch(error){
+
+    }
+
+
+   return res.status(200).send("JWT Created");
+
+})
+
+app.get('/JWT', async(req,res)=>{
+    try{
+        const token = req.cookies.token
+        console.log("Received token:", token);
+        if(!token){
+            return res.status(300).json();
+        }
+        const decoded = await tk.verifyToken(token)
+        console.log(await decoded);
+        if(!decoded){
+            return res.status(400).json("Brrrrrr________ wrong :P");
+        }else{
+            return res.status(200).json(decoded);
+        }
+
+
+    }
+    catch(error){
+        console.log(error);
+        
+    }
+})
+
 app.use(express.static(path.join(__dirname, 'src')));
 
 app.get('/', (req, res) => {
@@ -76,7 +116,7 @@ app.post('/log_in', async (req, res) => {
   try {
     const { username, password } = req.body;
 
-    // Check for missing fields
+    
     if (!username || !password) {
       return res.status(400).json({ message: "Username and password are required" });
     }
@@ -88,7 +128,7 @@ app.post('/log_in', async (req, res) => {
     }
 
     // Validate password
-    const valid = await db.checkLogin(username, password); // make sure this returns a Promise if async
+    const valid = await db.checkLogin(username, password); 
     if (!valid) {
       return res.status(400).json({ message: "Password is incorrect" });
     }
@@ -99,9 +139,9 @@ app.post('/log_in', async (req, res) => {
     
     if (cookie) {
       try {
-        decodedToken = tk.verifyToken(cookie); // assuming this verifies the JWT
+        decodedToken = tk.verifyToken(cookie); 
       } catch (err) {
-        console.warn("Invalid or expired token"); // silently ignore
+        console.warn("Invalid or expired token"); 
       }
     }
 
@@ -109,8 +149,8 @@ app.post('/log_in', async (req, res) => {
       return res.status(200).json({ message: "User already logged in", redirect: '/messages' });
     }
 
-    // Otherwise generate a new token
-    const token = await tk.generateToken({username}); // returns JWT
+   
+    const token = await tk.generateToken({username}); 
 
     res.cookie('token', token, {
       httpOnly: true,
@@ -127,8 +167,6 @@ app.post('/log_in', async (req, res) => {
     return res.status(500).json({ message: "Internal server error" });
   }
 });
-
-
 
 
 app.post('/register', async (req, res) => {
@@ -192,21 +230,3 @@ io.on('connection', (socket) => {
     })
 })
 
-
-
-async function checkUser(username){
-    const collection = db.collection('users')
-    const user = await collection.findOne({username: username})
-    if(!user){
-        return false
-    }
-    return user
-}
-
-async function checkPassword(password, user){
-    const validPassword = await bcrypt.compare(password, user.password)
-    if(!validPassword){
-        return false
-    }
-    return true
-}
